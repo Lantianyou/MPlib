@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 project(mp LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g3 -Wall -Werror -fsized-deallocation -Wno-deprecated-declarations")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g3 -Wall -Werror -Wno-error=dangling-else -fsized-deallocation -Wno-deprecated-declarations")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
@@ -27,6 +27,14 @@ find_package(Eigen3 3.4.0 REQUIRED)
 set(Boost_NO_WARN_NEW_VERSIONS 1)  # silence Boost CMake warnings
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 find_package(ompl REQUIRED)
+# Some Ubuntu OMPL exports contain absent optional include directories.
+set(MPLIB_OMPL_INCLUDES)
+foreach(directory IN LISTS OMPL_INCLUDE_DIRS)
+  if(IS_DIRECTORY "${directory}")
+    list(APPEND MPLIB_OMPL_INCLUDES "${directory}")
+  endif()
+endforeach()
+set(OMPL_INCLUDE_DIRS ${MPLIB_OMPL_INCLUDES})
 find_package(fcl REQUIRED)
 find_package(pinocchio REQUIRED)
 find_package(assimp REQUIRED)
